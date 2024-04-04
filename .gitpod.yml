@@ -1,0 +1,3 @@
+tasks:
+  - init: ./init.sh
+    command: trunk serve

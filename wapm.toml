@@ -1,0 +1,19 @@
+[package]
+name = "inyourface34456/color-print"
+version = "1.0.0"
+description = "a package for printing to the console in color"
+license = "MIT"
+repository = "https://github.com/inyourface34456/color-print"
+
+[[module]]
+name = "entry"
+source = "entry.wasm"
+abi = "wasm4"
+
+[module.interfaces]
+wasm4 = "0.0.1"
+
+[[command]]
+name = "entry"
+module = "entry"
+runner = "wasm4@0.0.1"

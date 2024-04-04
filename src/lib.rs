@@ -1,0 +1,1 @@
+wai_bindgen_rust::export!("color_print.wai");

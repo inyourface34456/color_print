@@ -1,0 +1,21 @@
+[package]
+name = "colors"
+version = "0.1.0"
+authors = ["inyourface3445 <trenten46@gmail.com>"]
+repository = "https://github.com/inyourface34456/color-print"
+homepage = "https://wasmer.io/"
+description = "a package for convrting colors"
+license = "MIT"
+edition = "2021"
+publish = false
+
+[package.metadata.wapm]
+namespace = "inyourface3445"
+abi = "none"
+bindings = { wai-version = "0.2.0", exports = "colors.wai" }
+
+[dependencies]
+wai-bindgen-rust = "0.2.3"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
