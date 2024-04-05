@@ -1,1 +1,29 @@
-test: func()
+type num-type = float64
+
+resource color {
+    static new: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
+    static from-rgb: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
+    static from-hex: func(value: string) -> expected<color, exeptions>
+    static from-hsl: func(hue: num-type, sateration: num-type, lightness: num-type) -> expected<color, exeptions>
+    static from-hsv: func(hue: num-type, sateration: num-type, value: num-type) -> expected<color, exeptions>
+    static from-cmyk: func(cyan: num-type, magenta: num-type, yellow: num-type, black: num-type) -> expected<color, exeptions>
+    to-hsl: func() -> option<tuple<num-type, num-type, num-type>>
+    to-hsv: func() -> option<tuple<num-type, num-type, num-type>>
+    to-cmyk: func() -> option<tuple<num-type, num-type, num-type, num-type>>
+    to-rgb: func() -> option<tuple<num-type, num-type, num-type>>
+}
+
+variant exeptions {
+    incorrect-length(u32),
+    hue-out-of-range(num-type),
+    sateration-out-of-range(num-type),
+    lightness-out-of-range(num-type),
+    value-out-of-range(num-type),
+    cyan-out-of-range(num-type),
+    magenta-out-of-range(num-type),
+    yellow-out-of-range(num-type),
+    black-out-of-range(num-type),
+    red-out-of-range(num-type),
+    green-out-of-range(num-type),
+    blue-out-of-range(num-type),
+}
