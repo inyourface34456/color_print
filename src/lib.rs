@@ -2,6 +2,7 @@ use crate::color_print::{Exeptions, NumType};
 use std::sync::RwLock;
 
 mod impls;
+mod utils;
 
 wai_bindgen_rust::export!("color_print.wai");
 
@@ -24,13 +25,13 @@ impl crate::color_print::Color for Color {
         yellow: f64,
         black: f64,
     ) -> Result<wai_bindgen_rust::Handle<crate::Color>, color_print::Exeptions> {
-        if cyan > 1. || cyan < 0. {
+        if !(0. ..=1.).contains(&cyan) {
             return Err(Exeptions::CyanOutOfRange(cyan));
-        } else if magenta > 1. || magenta < 0. {
+        } else if !(0. ..=1.).contains(&magenta) {
             return Err(Exeptions::MagentaOutOfRange(magenta));
-        } else if yellow > 1. || yellow < 0. {
+        } else if !(0. ..=1.).contains(&yellow) {
             return Err(Exeptions::YellowOutOfRange(yellow));
-        } else if black > 1. || black < 0. {
+        } else if !(0. ..=1.).contains(&black) {
             return Err(Exeptions::BlackOutOfRange(black));
         }
 
@@ -49,18 +50,17 @@ impl crate::color_print::Color for Color {
                 value.len().try_into().expect("length to large"),
             ));
         }
-        let values: [u8; 4];
 
-        if value.starts_with('#') {
+        let values: [u8; 4] = if value.starts_with('#') {
             let value = &value[1..value.len() - 1];
-            values = i32::from_str_radix(value, 16)
+            i32::from_str_radix(value, 16)
                 .expect("invalid syntax")
-                .to_le_bytes();
+                .to_le_bytes()
         } else {
-            values = i32::from_str_radix(value.as_str(), 16)
+            i32::from_str_radix(value.as_str(), 16)
                 .expect("invalid syntax")
-                .to_le_bytes();
-        }
+                .to_le_bytes()
+        };
 
         assert!(values[3] == 0);
 
@@ -80,11 +80,11 @@ impl crate::color_print::Color for Color {
         sateration: f64,
         lightness: f64,
     ) -> Result<wai_bindgen_rust::Handle<crate::Color>, color_print::Exeptions> {
-        if hue > 360. || hue < 0. {
+        if !(0. ..=360.).contains(&hue) {
             return Err(Exeptions::HueOutOfRange(hue));
-        } else if sateration > 1. || sateration < 0. {
+        } else if !(0. ..=1.).contains(&sateration) {
             return Err(Exeptions::SaterationOutOfRange(sateration));
-        } else if lightness > 1. || lightness < 0. {
+        } else if !(0. ..=1.).contains(&lightness) {
             return Err(Exeptions::LightnessOutOfRange(lightness));
         }
 
@@ -100,11 +100,11 @@ impl crate::color_print::Color for Color {
         sateration: f64,
         value: f64,
     ) -> Result<wai_bindgen_rust::Handle<crate::Color>, color_print::Exeptions> {
-        if hue > 360. || hue < 0. {
+        if !(0. ..=360.).contains(&hue) {
             return Err(Exeptions::HueOutOfRange(hue));
-        } else if sateration > 1. || sateration < 0. {
+        } else if !(0. ..=1.).contains(&sateration) {
             return Err(Exeptions::SaterationOutOfRange(sateration));
-        } else if value > 1. || value < 0. {
+        } else if !(0. ..=1.).contains(&value) {
             return Err(Exeptions::LightnessOutOfRange(value));
         }
 
@@ -120,11 +120,11 @@ impl crate::color_print::Color for Color {
         green: f64,
         blue: f64,
     ) -> Result<wai_bindgen_rust::Handle<crate::Color>, color_print::Exeptions> {
-        if red > 255. || red < 0. {
+        if !(0. ..=255.).contains(&red) {
             return Err(Exeptions::RedOutOfRange(red));
-        } else if green > 255. || green < 0. {
+        } else if !(0. ..=255.).contains(&green) {
             return Err(Exeptions::GreenOutOfRange(green));
-        } else if blue > 255. || blue < 0. {
+        } else if !(0. ..=255.).contains(&blue) {
             return Err(Exeptions::BlueOutOfRange(blue));
         }
 
