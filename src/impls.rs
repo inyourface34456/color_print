@@ -42,6 +42,11 @@ impl Display for Exeptions {
             Self::BlueOutOfRange(value) => {
                 write!(f, "Expectd a value inbetween 0 and 255 but got {}", value)
             }
+            Self::AlphaOutOfRange(value) => {
+                write!(f, "Expectd a value inbetween 0 and 1 but got {}", value)
+            }
         }
     }
 }
+
+impl std::error::Error for Exeptions {}

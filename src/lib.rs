@@ -1,8 +1,10 @@
-use crate::color_print::{Exeptions, NumType};
-use std::sync::RwLock;
-
 mod impls;
 mod utils;
+mod rgba;
+
+use crate::color_print::{Exeptions, NumType, ColorStandered};
+use std::sync::RwLock;
+use rgba::RGBA;
 
 wai_bindgen_rust::export!("color_print.wai");
 
@@ -16,6 +18,8 @@ struct Color {
     cymk: Wrapper<(NumType, NumType, NumType, NumType)>,
     hsl: Wrapper<(NumType, NumType, NumType)>,
     hsv: Wrapper<(NumType, NumType, NumType)>,
+    rgba: Wrapper<RGBA>,
+    kind: color_print::ColorStandered
 }
 
 impl crate::color_print::Color for Color {
@@ -37,6 +41,7 @@ impl crate::color_print::Color for Color {
 
         Ok(Self {
             cymk: RwLock::new(Some((cyan, magenta, yellow, black))),
+            kind: ColorStandered::Cymk,
             ..Self::default()
         }
         .into())
@@ -70,6 +75,7 @@ impl crate::color_print::Color for Color {
                 values[1] as NumType,
                 values[2] as NumType,
             ))),
+            kind: ColorStandered::Rgb,
             ..Self::default()
         }
         .into())
@@ -90,6 +96,7 @@ impl crate::color_print::Color for Color {
 
         Ok(Self {
             hsl: RwLock::new(Some((hue, sateration, lightness))),
+            kind: ColorStandered::Hsl,
             ..Self::default()
         }
         .into())
@@ -110,6 +117,7 @@ impl crate::color_print::Color for Color {
 
         Ok(Self {
             hsv: RwLock::new(Some((hue, sateration, value))),
+            kind: ColorStandered::Hsv,
             ..Self::default()
         }
         .into())
@@ -130,9 +138,36 @@ impl crate::color_print::Color for Color {
 
         Ok(Self {
             rgb: RwLock::new(Some((red, green, blue))),
+            kind: ColorStandered::Rgb,
             ..Self::default()
         }
         .into())
+    }
+
+    fn from_rgba(foreground: (f64, f64, f64), background: (f64, f64, f64), alpha: f64) -> Result<wai_bindgen_rust::Handle<crate::Color>, color_print::Exeptions> {
+        if !(0. ..=255.).contains(&foreground.0) {
+            return Err(Exeptions::RedOutOfRange(foreground.0));
+        } else if !(0. ..=255.).contains(&foreground.1) {
+            return Err(Exeptions::GreenOutOfRange(foreground.1));
+        } else if !(0. ..=255.).contains(&foreground.2) {
+            return Err(Exeptions::BlueOutOfRange(foreground.2));
+        } else if !(0. ..=255.).contains(&background.0) {
+            return Err(Exeptions::RedOutOfRange(background.0));
+        } else if !(0. ..=255.).contains(&background.1) {
+            return Err(Exeptions::GreenOutOfRange(background.1));
+        } else if !(0. ..=255.).contains(&background.2) {
+            return Err(Exeptions::BlueOutOfRange(background.2));
+        } else if !(0. ..=1.).contains(&alpha) {
+            return Err(Exeptions::AlphaOutOfRange(alpha));
+        }
+
+        Ok(
+            Self {
+                rgba: RwLock::new(Some(RGBA::new(foreground, background, alpha))),
+                kind: ColorStandered::Rgba,
+                ..Self::default()
+            }.into()
+        )
     }
 
     fn new(
@@ -149,15 +184,12 @@ impl crate::color_print::Color for Color {
         *cymk
     }
 
-    // fn to_hex(&self,) -> String {
-
-    // }
-
     fn to_hsl(&self) -> Option<(f64, f64, f64)> {
         let cymk = self.hsl.read().ok()?;
 
         *cymk
     }
+    
     fn to_hsv(&self) -> Option<(f64, f64, f64)> {
         let cymk = self.hsv.read().ok()?;
 
@@ -169,6 +201,24 @@ impl crate::color_print::Color for Color {
 
         *cymk
     }
+
+    fn to_rgba(&self) -> Option<(f64, f64, f64)> {
+        let rgba = self.rgba.read().ok()?;
+
+        (*rgba).map(|dat| dat.into())
+    }
+
+    fn as_standered(&self, standered: ColorStandered) {
+
+    }
+
+    fn get_standered(&self) -> ColorStandered {
+        self.kind
+    }
+
+    fn to_string(&self) -> String {
+        String::new()
+    }
 }
 
 impl Default for Color {
@@ -178,6 +228,8 @@ impl Default for Color {
             cymk: RwLock::new(None),
             hsl: RwLock::new(None),
             hsv: RwLock::new(None),
+            rgba: RwLock::new(None),
+            kind: ColorStandered::None,
         }
     }
 }
