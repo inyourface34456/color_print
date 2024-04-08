@@ -1,6 +1,6 @@
-use crate::color_print::Exeptions;
-use crate::RGBA;
-use crate::{Color, ColorStandered};
+use crate::color_print::{Color, Exeptions};
+use crate::utils::to_rgb;
+use crate::{Color as ColorStruct, ColorStandered};
 use core::fmt::Display;
 use std::sync::RwLock;
 
@@ -54,20 +54,17 @@ impl Display for Exeptions {
 
 impl std::error::Error for Exeptions {}
 
-impl Default for Color {
+impl Default for ColorStruct {
     fn default() -> Self {
         Self {
             rgb: RwLock::new(None),
             cmyk: RwLock::new(None),
             hsl: RwLock::new(None),
             hsv: RwLock::new(None),
-            rgba: RwLock::new(None),
             kind: RwLock::new(ColorStandered::None),
         }
     }
 }
-
-// impl ::core::marker::StructuralPartialEq for ColorStandered { }
 
 impl PartialEq for ColorStandered {
     fn eq(&self, other: &ColorStandered) -> bool {
@@ -77,21 +74,23 @@ impl PartialEq for ColorStandered {
     }
 }
 
-impl From<RGBA> for (f64, f64, f64) {
-    fn from(value: RGBA) -> Self {
-        let r = ((value.foreground.0 * value.alpha) + value.background.0) / 2.;
-        let g = ((value.foreground.1 * value.alpha) + value.background.1) / 2.;
-        let b = ((value.foreground.2 * value.alpha) + value.background.2) / 2.;
-        (r, g, b)
-    }
-}
+impl Display for ColorStruct {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let color = self.get_internel_color();
+        let rgb: (f64, f64, f64);
 
-impl Default for RGBA {
-    fn default() -> Self {
-        Self {
-            background: (0., 0., 0.),
-            foreground: (0., 0., 0.),
-            alpha: 0.,
+        if let Some(black) = color.3 {
+            let cmyk = (color.0, color.1, color.2, black);
+
+            rgb = to_rgb::cmyk_to_rgb(cmyk.0, cmyk.1, cmyk.2, cmyk.3);
+        } else {
+            match self.get_standered() {
+                ColorStandered::Rgb => rgb = (color.0, color.1, color.2),
+                ColorStandered::Hsl => rgb = to_rgb::hsl_to_rgb(color.0, color.1, color.2),
+                ColorStandered::Hsv => rgb = to_rgb::hsv_to_rgb(color.0, color.1, color.2),
+                _ => rgb = (0., 0., 0.)
+            };
         }
+        write!(f, "\x1b[38;2;{};{};{}m", rgb.0, rgb.1, rgb.2)
     }
 }

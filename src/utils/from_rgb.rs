@@ -1,6 +1,7 @@
 use crate::utils::helper::{max, min};
+use crate::utils::types::*;
 
-pub fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
+pub fn rgb_to_hsl(r: f64, g: f64, b: f64) -> HSL {
     let (mut h, s, l);
     let r = r / 255.;
     let g = g / 255.;
@@ -36,7 +37,7 @@ pub fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     (h, s, l)
 }
 
-pub fn rgb_to_hsv(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
+pub fn rgb_to_hsv(r: f64, g: f64, b: f64) -> RGB {
     let (mut h, s);
     let r = r / 255.;
     let g = g / 255.;
@@ -71,7 +72,7 @@ pub fn rgb_to_hsv(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     (h, s, cmax)
 }
 
-pub fn rgb_to_cmyk(r: f64, g: f64, b: f64) -> (f64, f64, f64, f64) {
+pub fn rgb_to_cmyk(r: f64, g: f64, b: f64) -> CMYK {
     let (c, m, y, k);
     let r = r / 255.;
     let g = g / 255.;
