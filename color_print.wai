@@ -37,7 +37,7 @@ variant exeptions {
 variant color-standered {
     rgb,
     hsv,
-    cymk,
+    cmyk,
     hsl,
     rgba,
     none

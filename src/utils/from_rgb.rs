@@ -1,6 +1,6 @@
-use crate::utils::helper::{min, max};
+use crate::utils::helper::{max, min};
 
-fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
+pub fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     let (mut h, s, l);
     let r = r / 255.;
     let g = g / 255.;
@@ -36,43 +36,42 @@ fn rgb_to_hsl(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     (h, s, l)
 }
 
-fn rgb_to_hsv(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
+pub fn rgb_to_hsv(r: f64, g: f64, b: f64) -> (f64, f64, f64) {
     let (mut h, s);
-        let r = r / 255.;
-        let g = g / 255.;
-        let b = b / 255.;
+    let r = r / 255.;
+    let g = g / 255.;
+    let b = b / 255.;
 
-        let cmin = min(r, g, b);
-        let cmax = max(r, g, b);
+    let cmin = min(r, g, b);
+    let cmax = max(r, g, b);
 
-        let delta = cmax - cmin;
+    let delta = cmax - cmin;
 
-        if delta == 0. {
-            h = 0.
-        } else if cmax == r {
-            h = (60. * (((g - b) / delta) % 6.)) % 360.;
+    if delta == 0. {
+        h = 0.
+    } else if cmax == r {
+        h = (60. * (((g - b) / delta) % 6.)) % 360.;
 
-            if h < 0. {
-                h += 360.
-            }
-        } else if cmax == g {
-            h = (60. * (((b - r) / delta) + 2.)) % 360.;
-        } else {
-            h = (60. * (((r - g) / delta) + 4.)) % 360.;
+        if h < 0. {
+            h += 360.
         }
+    } else if cmax == g {
+        h = (60. * (((b - r) / delta) + 2.)) % 360.;
+    } else {
+        h = (60. * (((r - g) / delta) + 4.)) % 360.;
+    }
 
-        if cmax != 0. {
-            s = delta / cmax
-        } else {
-            s = 0.
-        }
+    if cmax != 0. {
+        s = delta / cmax
+    } else {
+        s = 0.
+    }
 
-        let delta = cmax - cmin;
-        (h, s, cmax)
-
+    let delta = cmax - cmin;
+    (h, s, cmax)
 }
 
-fn rgb_to_cymk(r: f64, g: f64, b: f64) -> (f64, f64, f64, f64) {
+pub fn rgb_to_cmyk(r: f64, g: f64, b: f64) -> (f64, f64, f64, f64) {
     let (c, m, y, k);
     let r = r / 255.;
     let g = g / 255.;

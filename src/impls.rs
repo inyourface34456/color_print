@@ -1,5 +1,8 @@
 use crate::color_print::Exeptions;
+use crate::RGBA;
+use crate::{Color, ColorStandered};
 use core::fmt::Display;
+use std::sync::RwLock;
 
 impl Display for Exeptions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -50,3 +53,45 @@ impl Display for Exeptions {
 }
 
 impl std::error::Error for Exeptions {}
+
+impl Default for Color {
+    fn default() -> Self {
+        Self {
+            rgb: RwLock::new(None),
+            cmyk: RwLock::new(None),
+            hsl: RwLock::new(None),
+            hsv: RwLock::new(None),
+            rgba: RwLock::new(None),
+            kind: RwLock::new(ColorStandered::None),
+        }
+    }
+}
+
+// impl ::core::marker::StructuralPartialEq for ColorStandered { }
+
+impl PartialEq for ColorStandered {
+    fn eq(&self, other: &ColorStandered) -> bool {
+        let __self_tag = core::mem::discriminant(self);
+        let __arg1_tag = core::mem::discriminant(other);
+        __self_tag == __arg1_tag
+    }
+}
+
+impl From<RGBA> for (f64, f64, f64) {
+    fn from(value: RGBA) -> Self {
+        let r = ((value.foreground.0 * value.alpha) + value.background.0) / 2.;
+        let g = ((value.foreground.1 * value.alpha) + value.background.1) / 2.;
+        let b = ((value.foreground.2 * value.alpha) + value.background.2) / 2.;
+        (r, g, b)
+    }
+}
+
+impl Default for RGBA {
+    fn default() -> Self {
+        Self {
+            background: (0., 0., 0.),
+            foreground: (0., 0., 0.),
+            alpha: 0.,
+        }
+    }
+}
