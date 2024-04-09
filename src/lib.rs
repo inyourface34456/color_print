@@ -3,9 +3,6 @@ mod resourses;
 mod utils;
 
 use crate::color_print::ColorStandered;
-use resourses::Color;
+use resourses::{Color, ColorPrint};
 
 wai_bindgen_rust::export!("color_print.wai");
-
-struct ColorPrint;
-impl crate::color_print::ColorPrint for ColorPrint {}

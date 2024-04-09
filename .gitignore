@@ -18,3 +18,5 @@ key
 # Added by cargo
 
 /target
+
+wapm_packages

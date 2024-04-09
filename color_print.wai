@@ -39,3 +39,10 @@ variant color-standered {
     hsl,
     none
 }
+
+new: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
+from-rgb: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
+from-hex: func(value: string) -> expected<color, exeptions>
+from-hsl: func(hue: num-type, sateration: num-type, lightness: num-type) -> expected<color, exeptions>
+from-hsv: func(hue: num-type, sateration: num-type, value: num-type) -> expected<color, exeptions>
+from-cmyk: func(cyan: num-type, magenta: num-type, yellow: num-type, black: num-type) -> expected<color, exeptions>
