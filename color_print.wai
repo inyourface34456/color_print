@@ -16,6 +16,7 @@ resource color {
     get-internel-color: func() -> tuple<num-type, num-type, num-type, option<num-type>>
     to-string: func(background: option<color>) -> string
     into-rgb: func() -> tuple<num-type, num-type, num-type>
+    into-rgb-with-alpha: func(to-mix: color, alpha: num-type) -> expected<color, exeptions>
 }
 
 variant exeptions {

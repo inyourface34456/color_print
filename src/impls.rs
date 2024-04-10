@@ -1,5 +1,4 @@
 use crate::color_print::{Color, Exeptions};
-use crate::utils::to_rgb;
 use crate::{Color as ColorStruct, ColorStandered};
 use core::fmt::Display;
 use std::sync::RwLock;
@@ -76,21 +75,8 @@ impl PartialEq for ColorStandered {
 
 impl Display for ColorStruct {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let color = self.get_internel_color();
-        let rgb: (f64, f64, f64);
+        let rgb = self.into_rgb();
 
-        if let Some(black) = color.3 {
-            let cmyk = (color.0, color.1, color.2, black);
-
-            rgb = to_rgb::cmyk_to_rgb(cmyk.0, cmyk.1, cmyk.2, cmyk.3);
-        } else {
-            match self.get_standered() {
-                ColorStandered::Rgb => rgb = (color.0, color.1, color.2),
-                ColorStandered::Hsl => rgb = to_rgb::hsl_to_rgb(color.0, color.1, color.2),
-                ColorStandered::Hsv => rgb = to_rgb::hsv_to_rgb(color.0, color.1, color.2),
-                _ => rgb = (0., 0., 0.)
-            };
-        }
         write!(f, "\x1b[38;2;{};{};{}m", rgb.0, rgb.1, rgb.2)
     }
 }

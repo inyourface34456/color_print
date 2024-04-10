@@ -262,19 +262,19 @@ impl crate::color_print::Color for Color {
             ColorStandered::Rgb => {
                 let rgb = self.to_rgb().unwrap();
                 (rgb.0, rgb.1, rgb.2, None)
-            },
+            }
             ColorStandered::Hsl => {
                 let hsl = self.to_hsl().unwrap();
                 (hsl.0, hsl.1, hsl.2, None)
-            },
+            }
             ColorStandered::Hsv => {
                 let hsv = self.to_hsv().unwrap();
                 (hsv.0, hsv.1, hsv.2, None)
-            },
+            }
             ColorStandered::Cmyk => {
                 let cmyk = self.to_cmyk().unwrap();
                 (cmyk.0, cmyk.1, cmyk.2, Some(cmyk.3))
-            },
+            }
             ColorStandered::None => (0., 0., 0., None),
         }
     }
@@ -292,20 +292,38 @@ impl crate::color_print::Color for Color {
                 ColorStandered::Rgb => rgb = (color.0, color.1, color.2),
                 ColorStandered::Hsl => rgb = to_rgb::hsl_to_rgb(color.0, color.1, color.2),
                 ColorStandered::Hsv => rgb = to_rgb::hsv_to_rgb(color.0, color.1, color.2),
-                _ => rgb = (0., 0., 0.)
+                _ => rgb = (0., 0., 0.),
             };
         }
         rgb
     }
 
-    fn to_string(&self, background:Option<Handle<Self>>,) -> String {
+    fn to_string(&self, background: Option<Handle<Self>>) -> String {
         if background.is_none() {
             return format!("{}", self);
         }
 
         let forground = self.into_rgb();
         let background = background.unwrap().into_rgb();
+
+        format!(
+            "\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m",
+            forground.0, forground.1, forground.2, background.0, background.1, background.2
+        )
+    }
+
+    fn into_rgb_with_alpha(&self, to_mix: Handle<Color>, alpha: NumType) -> NewColorResult {
+        if (0. ..=1.).contains(&alpha) {
+            return Err(Exeptions::AlphaOutOfRange(alpha))
+        }
         
-        format!("\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m", forground.0, forground.1, forground.2, background.0, background.1, background.2)
+        let fg = self.into_rgb();
+        let bg = to_mix.into_rgb();
+
+        let r = ((fg.0 * alpha) + bg.0) / 2.;
+        let g = ((fg.1 * alpha) + bg.1) / 2.;
+        let b = ((fg.2 * alpha) + bg.2) / 2.;
+
+        Color::new(r, g, b)
     }
 }
