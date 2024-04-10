@@ -14,6 +14,8 @@ resource color {
     as-standered: func(standered: color-standered)
     get-standered: func() -> color-standered
     get-internel-color: func() -> tuple<num-type, num-type, num-type, option<num-type>>
+    to-string: func(background: option<color>) -> string
+    into-rgb: func() -> tuple<num-type, num-type, num-type>
 }
 
 variant exeptions {

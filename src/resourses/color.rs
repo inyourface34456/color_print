@@ -2,6 +2,7 @@ use crate::color_print::{ColorStandered, Exeptions, NumType};
 use crate::utils::types::*;
 use crate::utils::{from_rgb, to_rgb};
 use std::sync::RwLock;
+use wai_bindgen_rust::Handle;
 
 pub struct Color {
     pub rgb: Wrapper<(NumType, NumType, NumType)>,
@@ -276,5 +277,35 @@ impl crate::color_print::Color for Color {
             },
             ColorStandered::None => (0., 0., 0., None),
         }
+    }
+
+    fn into_rgb(&self) -> RGB {
+        let color = self.get_internel_color();
+        let rgb: (f64, f64, f64);
+
+        if let Some(black) = color.3 {
+            let cmyk = (color.0, color.1, color.2, black);
+
+            rgb = to_rgb::cmyk_to_rgb(cmyk.0, cmyk.1, cmyk.2, cmyk.3);
+        } else {
+            match self.get_standered() {
+                ColorStandered::Rgb => rgb = (color.0, color.1, color.2),
+                ColorStandered::Hsl => rgb = to_rgb::hsl_to_rgb(color.0, color.1, color.2),
+                ColorStandered::Hsv => rgb = to_rgb::hsv_to_rgb(color.0, color.1, color.2),
+                _ => rgb = (0., 0., 0.)
+            };
+        }
+        rgb
+    }
+
+    fn to_string(&self, background:Option<Handle<Self>>,) -> String {
+        if background.is_none() {
+            return format!("{}", self);
+        }
+
+        let forground = self.into_rgb();
+        let background = background.unwrap().into_rgb();
+        
+        format!("\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m", forground.0, forground.1, forground.2, background.0, background.1, background.2)
     }
 }

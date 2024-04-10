@@ -1,4 +1,5 @@
 cargo install cargo-wasm
+cargo install cargo-wapm
 cargo install wapm-cli
 rustup target add wasm32-unknown-unknown
 curl https://get.wasmer.io -sSfL | sh
