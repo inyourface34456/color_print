@@ -1,6 +1,6 @@
 [package]
 name = "color-print"
-version = "0.2.1"
+version = "0.2.2"
 authors = ["inyourface3445 <trenten46@gmail.com>"]
 repository = "https://github.com/inyourface34456/color-print"
 homepage = "https://wasmer.io/inyourface3445/color-print/"

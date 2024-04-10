@@ -295,7 +295,7 @@ impl crate::color_print::Color for Color {
                 _ => rgb = (0., 0., 0.),
             };
         }
-        rgb
+        (rgb.0 as i64 as f64, rgb.1 as i64 as f64, rgb.2 as i64 as f64)
     }
 
     fn to_string(&self, background: Option<Handle<Self>>) -> String {
