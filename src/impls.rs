@@ -75,8 +75,8 @@ impl PartialEq for ColorStandered {
 
 impl Display for ColorStruct {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let rgb = self.into_rgb();
+        let rgb = self.into_standered(ColorStandered::Rgb);
 
-        write!(f, "\x1b[38;2;{};{};{}m", rgb.0, rgb.1, rgb.2)
+        write!(f, "\x1b[38;2;{};{};{}m", rgb.0.trunc(), rgb.1.trunc(), rgb.2.trunc())
     }
 }

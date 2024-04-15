@@ -2,6 +2,7 @@ type num-type = float64
 
 resource color {
     static new: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
+    static new-unchecked: func(red: num-type, green: num-type, blue: num-type) -> color
     static from-rgb: func(red: num-type, green: num-type, blue: num-type) -> expected<color, exeptions>
     static from-hex: func(value: string) -> expected<color, exeptions>
     static from-hsl: func(hue: num-type, sateration: num-type, lightness: num-type) -> expected<color, exeptions>
@@ -15,7 +16,7 @@ resource color {
     get-standered: func() -> color-standered
     get-internel-color: func() -> tuple<num-type, num-type, num-type, option<num-type>>
     to-string: func(background: option<color>) -> string
-    into-rgb: func() -> tuple<num-type, num-type, num-type>
+    into-standered: func(standered: color-standered) -> tuple<num-type, num-type, num-type, option<num-type>>
     into-rgb-with-alpha: func(to-mix: color, alpha: num-type) -> expected<color, exeptions>
 }
 

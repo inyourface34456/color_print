@@ -119,6 +119,15 @@ impl crate::color_print::Color for Color {
         Self::from_rgb(red, green, blue)
     }
 
+    fn new_unchecked(red: f64, green: f64, blue: f64) -> Handle<Color> {
+        Self {
+            rgb: RwLock::new(Some((red, green, blue))),
+            kind: RwLock::new(ColorStandered::Rgb),
+            ..Self::default()
+        }
+        .into()
+    }
+
     fn to_cmyk(&self) -> Option<CMYK> {
         *(self.cmyk.read().ok()?)
     }
@@ -279,23 +288,126 @@ impl crate::color_print::Color for Color {
         }
     }
 
-    fn into_rgb(&self) -> RGB {
-        let color = self.get_internel_color();
-        let rgb: (f64, f64, f64);
+    fn into_standered(&self, standered: ColorStandered) -> (NumType, NumType, NumType, Option<NumType>) {
+        let kind = self.get_standered();
 
-        if let Some(black) = color.3 {
-            let cmyk = (color.0, color.1, color.2, black);
-
-            rgb = to_rgb::cmyk_to_rgb(cmyk.0, cmyk.1, cmyk.2, cmyk.3);
-        } else {
-            match self.get_standered() {
-                ColorStandered::Rgb => rgb = (color.0, color.1, color.2),
-                ColorStandered::Hsl => rgb = to_rgb::hsl_to_rgb(color.0, color.1, color.2),
-                ColorStandered::Hsv => rgb = to_rgb::hsv_to_rgb(color.0, color.1, color.2),
-                _ => rgb = (0., 0., 0.),
-            };
+        if standered == kind || standered == ColorStandered::None {
+            return match standered {
+                ColorStandered::Cmyk => {
+                    let color = self.to_cmyk().unwrap();
+                    (color.0, color.1, color.2, Some(color.3))
+                },
+                ColorStandered::Rgb => {
+                    let value = self.to_rgb().unwrap();
+                    (value.0, value.1, value.2, None)
+                },
+                ColorStandered::Hsl => {
+                    let value = self.to_hsl().unwrap();
+                    (value.0, value.1, value.2, None)
+                },
+                ColorStandered::Hsv => {
+                    let value = self.to_hsv().unwrap();
+                    (value.0, value.1, value.2, None)
+                },
+                ColorStandered::None => (0., 0., 0., None)
+            }
         }
-        (rgb.0 as i64 as f64, rgb.1 as i64 as f64, rgb.2 as i64 as f64)
+
+        return match standered {
+            ColorStandered::Cmyk => match kind {
+                ColorStandered::Hsl => {
+                    let hsl = self.hsl.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsl_to_rgb(hsl.0, hsl.1, hsl.2);
+                    let cmyk = from_rgb::rgb_to_cmyk(rgb.0, rgb.1, rgb.2);
+
+                    (cmyk.0, cmyk.1, cmyk.2, Some(cmyk.3))
+                }
+                ColorStandered::Hsv => {
+                    let hsv = self.hsv.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsl_to_rgb(hsv.0, hsv.1, hsv.2);
+                    let cmyk = from_rgb::rgb_to_cmyk(rgb.0, rgb.1, rgb.2);
+
+                    (cmyk.0, cmyk.1, cmyk.2, Some(cmyk.3))
+                }
+                ColorStandered::Rgb => {
+                    let rgb = self.rgb.write().unwrap().take().unwrap_or_default();
+                    let cmyk = from_rgb::rgb_to_cmyk(rgb.0, rgb.1, rgb.2);
+
+                    (cmyk.0, cmyk.1, cmyk.2, Some(cmyk.3))
+                }
+                _ => (0., 0., 0., None)
+            },
+            ColorStandered::Hsl => match kind {
+                ColorStandered::Cmyk => {
+                    let origin = self.cmyk.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::cmyk_to_rgb(origin.0, origin.1, origin.2, origin.3);
+                    let end = from_rgb::rgb_to_hsl(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                ColorStandered::Hsv => {
+                    let origin = self.hsv.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsv_to_rgb(origin.0, origin.1, origin.2);
+                    let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                ColorStandered::Rgb => {
+                    let origin = self.rgb.write().unwrap().take().unwrap_or_default();
+                    let rgb = origin;
+                    let end = from_rgb::rgb_to_hsl(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                _ => (0., 0., 0., None)
+            },
+            ColorStandered::Hsv => match kind {
+                ColorStandered::Cmyk => {
+                    let origin = self.cmyk.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::cmyk_to_rgb(origin.0, origin.1, origin.2, origin.3);
+                    let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                ColorStandered::Hsl => {
+                    let origin = self.hsl.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsl_to_rgb(origin.0, origin.1, origin.2);
+                    let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                ColorStandered::Rgb => {
+                    let origin = self.rgb.write().unwrap().take().unwrap_or_default();
+                    let rgb = origin;
+                    let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
+
+                    (end.0, end.1, end.2, None)
+                }
+                _ => (0., 0., 0., None)
+            },
+            ColorStandered::Rgb => match kind {
+                ColorStandered::Cmyk => {
+                    let origin = self.cmyk.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::cmyk_to_rgb(origin.0, origin.1, origin.2, origin.3);
+
+                    (rgb.0, rgb.1, rgb.2, None)
+                }
+                ColorStandered::Hsl => {
+                    let origin = self.hsl.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsl_to_rgb(origin.0, origin.1, origin.2);
+
+                    (rgb.0, rgb.1, rgb.2, None)
+                }
+                ColorStandered::Hsv => {
+                    let origin = self.hsv.write().unwrap().take().unwrap_or_default();
+                    let rgb = to_rgb::hsv_to_rgb(origin.0, origin.1, origin.2);
+
+                    (rgb.0, rgb.1, rgb.2, None)
+                }
+                _ => (0., 0., 0., None)
+            },
+            _ => (0., 0., 0., None)
+        }
     }
 
     fn to_string(&self, background: Option<Handle<Self>>) -> String {
@@ -303,12 +415,12 @@ impl crate::color_print::Color for Color {
             return format!("{}", self);
         }
 
-        let forground = self.into_rgb();
-        let background = background.unwrap().into_rgb();
+        let forground = self.into_standered(ColorStandered::Rgb);
+        let background = background.unwrap().into_standered(ColorStandered::Rgb);
 
         format!(
             "\x1b[38;2;{};{};{}m\x1b[48;2;{};{};{}m",
-            forground.0, forground.1, forground.2, background.0, background.1, background.2
+            forground.0.trunc(), forground.1.trunc(), forground.2.trunc(), background.0.trunc(), background.1.trunc(), background.2.trunc()
         )
     }
 
@@ -317,8 +429,8 @@ impl crate::color_print::Color for Color {
             return Err(Exeptions::AlphaOutOfRange(alpha))
         }
         
-        let fg = self.into_rgb();
-        let bg = to_mix.into_rgb();
+        let fg = self.into_standered(ColorStandered::Rgb);
+        let bg = to_mix.into_standered(ColorStandered::Rgb);
 
         let r = ((fg.0 * alpha) + bg.0) / 2.;
         let g = ((fg.1 * alpha) + bg.1) / 2.;
