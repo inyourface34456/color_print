@@ -58,9 +58,9 @@ pub fn cmyk_to_rgb(cyan: f64, magenta: f64, yellow: f64, black: f64) -> (f64, f6
 mod test {
     use super::*;
     use crate::utils::from_rgb::*;
+    use colors_transform::{Color, Hsl, Rgb};
     use rand::prelude::*;
     use std::{fs::File, io::Write};
-    use colors_transform::{Rgb, Color, Hsl};
 
     #[test]
     fn test_hsl() {
@@ -77,33 +77,41 @@ mod test {
             let rgb2 = Hsl::from(start.0, start.1, start.2).to_rgb().as_tuple();
             let rgb2 = (rgb2.0 as f64, rgb2.1 as f64, rgb2.2 as f64);
 
-            assert!((data.0-rgb2.0/255.).abs() <= epsilon, "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
-            start.0,
-            start.1,
-            start.2,
-            rgb2.0/255.,
-            rgb2.1/255.,
-            rgb2.2/255.,
-            i);
-            assert!((data.1-rgb2.1/255.).abs() <= epsilon, "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
-            start.0,
-            start.1,
-            start.2,
-            rgb2.0/255.,
-            rgb2.1/255.,
-            rgb2.2/255.,
-            i);
-            assert!((data.2-rgb2.2/255.).abs() <= epsilon, "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
-            start.0,
-            start.1,
-            start.2,
-            rgb2.0/255.,
-            rgb2.1/255.,
-            rgb2.2/255.,
-            i);
+            assert!(
+                (data.0 - rgb2.0 / 255.).abs() <= epsilon,
+                "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
+                start.0,
+                start.1,
+                start.2,
+                rgb2.0 / 255.,
+                rgb2.1 / 255.,
+                rgb2.2 / 255.,
+                i
+            );
+            assert!(
+                (data.1 - rgb2.1 / 255.).abs() <= epsilon,
+                "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
+                start.0,
+                start.1,
+                start.2,
+                rgb2.0 / 255.,
+                rgb2.1 / 255.,
+                rgb2.2 / 255.,
+                i
+            );
+            assert!(
+                (data.2 - rgb2.2 / 255.).abs() <= epsilon,
+                "({}, {}, {}) became ({}, {}, {}) on the {}th iteration",
+                start.0,
+                start.1,
+                start.2,
+                rgb2.0 / 255.,
+                rgb2.1 / 255.,
+                rgb2.2 / 255.,
+                i
+            );
         }
     }
-    
 
     #[test]
     fn test_hsv() {
@@ -205,4 +213,3 @@ mod test {
     //     }
     // }*/
 }
-

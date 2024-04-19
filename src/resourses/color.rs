@@ -207,7 +207,6 @@ impl crate::color_print::Color for Color {
                     let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
 
                     self.hsv.replace(Some(end));
-                    
                 }
                 ColorStandered::Hsl => {
                     let origin = self.hsl.get().unwrap_or_default();
@@ -215,7 +214,6 @@ impl crate::color_print::Color for Color {
                     let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
 
                     self.hsv.replace(Some(end));
-                    
                 }
                 ColorStandered::Rgb => {
                     let origin = self.rgb.get().unwrap_or_default();
@@ -223,7 +221,6 @@ impl crate::color_print::Color for Color {
                     let end = from_rgb::rgb_to_hsv(rgb.0, rgb.1, rgb.2);
 
                     self.hsv.replace(Some(end));
-                    
                 }
                 _ => {}
             },
@@ -233,21 +230,18 @@ impl crate::color_print::Color for Color {
                     let rgb = to_rgb::cmyk_to_rgb(origin.0, origin.1, origin.2, origin.3);
 
                     self.rgb.replace(Some(rgb));
-                    
                 }
                 ColorStandered::Hsl => {
                     let origin = self.hsl.get().unwrap_or_default();
                     let rgb = to_rgb::hsl_to_rgb(origin.0, origin.1, origin.2);
 
                     self.rgb.replace(Some(rgb));
-                    
                 }
                 ColorStandered::Hsv => {
                     let origin = self.hsv.get().unwrap_or_default();
                     let rgb = to_rgb::hsv_to_rgb(origin.0, origin.1, origin.2);
 
                     self.rgb.replace(Some(rgb));
-                    
                 }
                 _ => {}
             },
