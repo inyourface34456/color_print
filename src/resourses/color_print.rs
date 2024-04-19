@@ -1,11 +1,16 @@
 use crate::color_print::{Color as _, NumType};
 use crate::resourses::Color;
 use crate::utils::types::NewColorResult;
+use wai_bindgen_rust::Handle;
 
 pub struct ColorPrint;
 impl crate::color_print::ColorPrint for ColorPrint {
     fn new(red: NumType, green: NumType, blue: NumType) -> NewColorResult {
         Color::new(red, green, blue)
+    }
+
+    fn new_unchecked(red: NumType, green: NumType, blue: NumType) -> Handle<Color> {
+        Color::new_unchecked(red, green, blue)
     }
 
     fn from_cmyk(
